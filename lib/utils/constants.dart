@@ -1,43 +1,74 @@
 import '../models/cooking_tool.dart';
 
 class Constants {
-  // Common ingredients list
-  static const List<String> commonIngredients = [
-    'Onion',
-    'Garlic',
-    'Egg',
-    'Rice cake',
-    'Chicken',
-    'Beef',
-    'Pork',
-    'Tofu',
-    'Potato',
-    'Carrot',
-    'Cabbage',
-    'Spinach',
-    'Tomato',
-    'Mushroom',
-    'Cheese',
-    'Butter',
-    'Milk',
-    'Flour',
-    'Sugar',
-    'Salt',
-    'Pepper',
-    'Soy sauce',
-    'Sesame oil',
-  ];
+  // Ingredient categories (sorted alphabetically)
+  static const Map<String, List<String>> ingredientCategories = {
+    'Vegetables': [
+      'Asparagus',
+      'Broccoli',
+      'Cabbage',
+      'Carrots',
+      'Corn',
+      'Cucumber',
+      'Eggplant',
+      'Garlic',
+      'Green Beans',
+      'Lettuce',
+      'Mushrooms',
+      'Onions',
+      'Peppers',
+      'Potato',
+      'Spinach',
+      'Sweet Potato',
+      'Tomatoes',
+      'Zucchini',
+    ],
+    'Dairy': [
+      'Butter',
+      'Cheese',
+      'Cream',
+      'Milk',
+      'Yogurt',
+    ],
+    'Proteins': [
+      'Beef',
+      'Chicken',
+      'Eggs',
+      'Fish',
+      'Pork',
+      'Shrimp',
+      'Tofu',
+    ],
+    'Grains & Pasta': [
+      'Bread',
+      'Flour',
+      'Noodles',
+      'Pasta',
+      'Quinoa',
+      'Rice',
+    ],
+    'Pantry': [
+      'Honey',
+      'Olive Oil',
+      'Pepper',
+      'Salt',
+      'Soy Sauce',
+      'Sugar',
+      'Vinegar',
+    ],
+  };
 
-  // Common cooking tools
+  // Common cooking tools (sorted alphabetically)
   static const List<CookingTool> commonTools = [
+    CookingTool(name: 'Air Fryer', icon: '💨'),
+    CookingTool(name: 'Blender', icon: '🌀'),
     CookingTool(name: 'Frying pan', icon: '🍳'),
-    CookingTool(name: 'Pot', icon: '🥘'),
-    CookingTool(name: 'Oven', icon: '🔥'),
+    CookingTool(name: 'Grill', icon: '🍖'),
     CookingTool(name: 'Microwave', icon: '📻'),
-    CookingTool(name: 'Rice cooker', icon: '🍚'),
-    CookingTool(name: 'Blender', icon: '🌪️'),
-    CookingTool(name: 'Knife', icon: '🔪'),
     CookingTool(name: 'No special tools', icon: '✋'),
+    CookingTool(name: 'Oven', icon: '🍳'),
+    CookingTool(name: 'Pot', icon: '🥘'),
+    CookingTool(name: 'Stove', icon: '🔥'),
   ];
 
   // API configuration
