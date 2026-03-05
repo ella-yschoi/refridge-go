@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/recipe.dart';
@@ -19,13 +19,17 @@ class OpenAIService {
 
   String? get _apiKey => dotenv.env['OPENAI_API_KEY'];
 
+  /// On web, use the serverless proxy to hide the API key.
+  /// On other platforms, call OpenAI directly.
+  bool get _useProxy => kIsWeb && (_apiKey == null || _apiKey!.isEmpty);
+
   /// Generate recipe recommendation based on user inputs
   Future<Recipe> generateRecipe({
     required List<Ingredient> ingredients,
     required CookingTool tool,
     required Difficulty difficulty,
   }) async {
-    if (_apiKey == null || _apiKey!.isEmpty) {
+    if (!_useProxy && (_apiKey == null || _apiKey!.isEmpty)) {
       throw Exception('OpenAI API key is not configured. Please check your .env file.');
     }
 
@@ -44,25 +48,38 @@ class OpenAIService {
       difficulty.label,
     );
 
+    final requestBody = jsonEncode({
+      'model': Constants.openAIModel,
+      'messages': [
+        {
+          'role': 'user',
+          'content': prompt,
+        }
+      ],
+      'max_tokens': Constants.maxTokens,
+      'temperature': 0.7,
+    });
+
     final client = httpClient ?? http.Client();
     try {
-      final response = await client.post(
-        Uri.parse('https://api.openai.com/v1/chat/completions'),
-        headers: {
+      final Uri url;
+      final Map<String, String> headers;
+
+      if (_useProxy) {
+        url = Uri.parse('/api/generate-recipe');
+        headers = {'Content-Type': 'application/json'};
+      } else {
+        url = Uri.parse('https://api.openai.com/v1/chat/completions');
+        headers = {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $_apiKey',
-        },
-        body: jsonEncode({
-          'model': Constants.openAIModel,
-          'messages': [
-            {
-              'role': 'user',
-              'content': prompt,
-            }
-          ],
-          'max_tokens': Constants.maxTokens,
-          'temperature': 0.7,
-        }),
+        };
+      }
+
+      final response = await client.post(
+        url,
+        headers: headers,
+        body: requestBody,
       );
 
       if (response.statusCode == 200) {
