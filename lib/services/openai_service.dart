@@ -87,12 +87,24 @@ Ingredients: ${ingredients.join(', ')}
 Tools: $tool
 Difficulty: $difficulty
 
-Return the result in JSON format:
+Return the result in JSON format with the following structure:
 {
   "menu": "menu name",
   "description": "short description of the dish",
+  "cookingTime": 30,
+  "servings": 4,
+  "difficulty": "$difficulty",
+  "ingredients": ["detailed ingredient with quantity", "another ingredient"],
+  "tools": ["$tool"],
   "steps": ["step 1", "step 2", "step 3"]
 }
+
+Make sure to:
+- Provide specific quantities for each ingredient
+- Include the selected tool in the tools array
+- Use the provided difficulty level
+- Provide realistic cooking time in minutes
+- List clear step-by-step instructions
 ''';
   }
 
