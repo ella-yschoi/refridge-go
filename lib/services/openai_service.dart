@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/recipe.dart';
@@ -11,6 +12,10 @@ class OpenAIService {
   static final OpenAIService _instance = OpenAIService._internal();
   factory OpenAIService() => _instance;
   OpenAIService._internal();
+
+  /// Override HTTP client for testing
+  @visibleForTesting
+  http.Client? httpClient;
 
   String? get _apiKey => dotenv.env['OPENAI_API_KEY'];
 
@@ -39,8 +44,9 @@ class OpenAIService {
       difficulty.label,
     );
 
+    final client = httpClient ?? http.Client();
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +68,7 @@ class OpenAIService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'] as String;
-        return _parseRecipeResponse(content);
+        return parseRecipeResponse(content);
       } else {
         throw Exception(
           'Failed to generate recipe: ${response.statusCode} - ${response.body}',
@@ -70,6 +76,8 @@ class OpenAIService {
       }
     } catch (e) {
       throw Exception('Error calling OpenAI API: $e');
+    } finally {
+      if (httpClient == null) client.close();
     }
   }
 
@@ -109,7 +117,8 @@ Make sure to:
   }
 
   /// Parse the response from OpenAI API
-  Recipe _parseRecipeResponse(String content) {
+  @visibleForTesting
+  Recipe parseRecipeResponse(String content) {
     try {
       // Extract JSON from markdown code blocks if present
       String jsonString = content.trim();
